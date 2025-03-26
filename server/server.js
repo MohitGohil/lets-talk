@@ -17,8 +17,7 @@ const databaseURL = process.env.DATABASE_URL;
 
 app.use(
   cors({
-    origin: process.env.ORIGIN,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    origin: [process.env.ORIGIN],
     credentials: true,
   })
 );
@@ -29,6 +28,9 @@ app.use("/uploads/files", express.static("uploads/files"));
 app.use(cookieParser());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactsRoutes);
 app.use("/api/messages", messagesRoutes);

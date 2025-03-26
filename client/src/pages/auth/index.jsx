@@ -27,11 +27,12 @@ function Auth() {
       return false;
     }
     if (password !== confirmPassword) {
-      toast.error("Password and confirm password should be same.");
+      toast.error("Password and confirm password should be the same.");
       return false;
     }
     return true;
   };
+
   const validateLogin = () => {
     if (!email.length) {
       toast.error("Email is required.");
@@ -46,33 +47,49 @@ function Auth() {
 
   const handleLogin = async () => {
     if (validateLogin()) {
-      const response = await apiClient.post(
-        LOGIN_ROUTE,
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log({ login: response });
-      if (response.data.user.id) {
-        setUserInfo(response.data.user);
-        if (response.data.user.profileSetup) {
-          navigate("/chat");
-        } else {
-          navigate("/profile");
+      try {
+        const response = await apiClient.post(
+          LOGIN_ROUTE,
+          { email, password },
+          { withCredentials: true }
+        );
+        console.log({ login: response });
+
+        if (response?.data?.user?.id) {
+          setUserInfo(response.data.user);
+          toast.success("Login successful!");
+
+          if (response.data.user.profileSetup) {
+            navigate("/chat");
+          } else {
+            navigate("/profile");
+          }
         }
+      } catch (error) {
+        toast.error(error.response?.data || "Login failed. Please try again.");
+        console.error(error);
       }
     }
   };
+
   const handleSignup = async () => {
     if (validateSignup()) {
-      const response = await apiClient.post(
-        SIGNUP_ROUTE,
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log({ signup: response });
-      if (response.status === 201) {
-        setUserInfo(response.data.user);
-        navigate("/profile");
+      try {
+        const response = await apiClient.post(
+          SIGNUP_ROUTE,
+          { email, password },
+          { withCredentials: true }
+        );
+        console.log({ signup: response });
+
+        if (response.status === 201) {
+          setUserInfo(response.data.user);
+          toast.success("Signup successful! Redirecting to profile...");
+          navigate("/profile");
+        }
+      } catch (error) {
+        toast.error(error.response?.data || "Signup failed. Please try again.");
+        console.error(error);
       }
     }
   };

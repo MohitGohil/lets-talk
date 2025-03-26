@@ -38,4 +38,30 @@ export const createChatSlice = (set, get) => ({
       ],
     });
   },
+  addChannelInChannelList: (message) => {
+    const channels = get().channels;
+    const index = channels.findIndex((channel) => channel._id === message.channelId);
+
+    if (index !== -1) {
+      // Remove the channel from its current position
+      const [channel] = channels.splice(index, 1);
+      // Add it to the front of the list
+      set({ channels: [channel, ...channels] });
+    }
+  },
+  addContactsInDMContacts: (message) => {
+    const userId = get().userInfo.id;
+    const formId = message.sender._id === userId ? message.recipient._id : message.sender._id;
+    const formData = message.sender._id === userId ? message.recipient : message.sender;
+    const directMessagesContacts = get().directMessagesContacts;
+    const data = directMessagesContacts.find((contact) => contact._id === formId);
+    const index = directMessagesContacts.findIndex((contact) => contact._id === formId);
+    if (index !== -1) {
+      directMessagesContacts.splice(index, 1);
+      directMessagesContacts.unshift(data);
+    } else {
+      directMessagesContacts.unshift(formData);
+    }
+    set({ directMessagesContacts });
+  },
 });
